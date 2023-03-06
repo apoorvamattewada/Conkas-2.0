@@ -1,0 +1,4 @@
+This is the first iteration of Conkas 2.0
+The presentation was taken on 02/16/2023.
+
+Scores for the Iteration 1: 
