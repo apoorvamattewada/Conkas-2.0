@@ -5,7 +5,7 @@ from solcx import get_available_solc_versions, install_solc_pragma, set_solc_ver
 from solcx.exceptions import SolcNotInstalled
 from solcx.install import get_executable
 from solidity_parser.parser import parse
-
+import vuln_finder.bad_randomness as bad_randomness
 import vuln_finder.vulnerability_finder
 from rattle import Recover
 from solidity.source_map import SourceMap
@@ -40,8 +40,10 @@ def main():
     find_all_vulnerabilities_default = False
     default_timeout = 100
 
-    parser = argparse.ArgumentParser(description='Symbolic execution tool for EVM')
-    parser.add_argument('file', type=argparse.FileType('rb'), help='File with EVM bytecode hex string to analyse')
+    parser = argparse.ArgumentParser(
+        description='Symbolic execution tool for EVM')
+    parser.add_argument('file', type=argparse.FileType(
+        'rb'), help='File with EVM bytecode hex string to analyse')
     parser.add_argument('--solidity-file', '-s', action='store_true', default=is_solidity_file_default,
                         help=f'Use this option when file is a solidity file instead of EVM bytecode hex string. By default it is {"unset" if not is_solidity_file_default else "set"}')
     parser.add_argument('--verbosity', '-v', type=str, default=log_output_default,
@@ -107,7 +109,8 @@ def main():
             sym_exec = SymExec(ssa)
             traces = sym_exec.execute()
 
-            checker = VulnerabilityFinder(traces, ssa.functions, name, srcmap, args.find_all_vulnerabilities)
+            checker = VulnerabilityFinder(
+                traces, ssa.functions, name, srcmap, args.find_all_vulnerabilities)
             vulnerabilities_found = checker.analyse_only(args.vuln_type)
         except Exception as e:
             logger.exception(e)
@@ -131,6 +134,11 @@ def main():
                 else:
                     logger.info(f'and {var_name} = {value}')
                     print(f'and {var_name} = {value}')
+    if args.solidity_file:
+        solidity_file_path = args.file.name
+        print("Analyzing bad randomness patterns in the Solidity file...")
+        bad_randomness.bad_randomness_analyse(
+            solidity_file_path, args.find_all_vulnerabilities)
 
 
 if __name__ == '__main__':
