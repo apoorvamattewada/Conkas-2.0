@@ -6,6 +6,7 @@ from solcx.exceptions import SolcNotInstalled
 from solcx.install import get_executable
 from solidity_parser.parser import parse
 import vuln_finder.bad_randomness as bad_randomness
+from vuln_finder.short_address import analyze_vulnerabilities
 import vuln_finder.vulnerability_finder
 from rattle import Recover
 from solidity.source_map import SourceMap
@@ -136,9 +137,12 @@ def main():
                     print(f'and {var_name} = {value}')
     if args.solidity_file:
         solidity_file_path = args.file.name
-        print("Analyzing bad randomness patterns in the Solidity file...")
+
         bad_randomness.bad_randomness_analyse(
             solidity_file_path, args.find_all_vulnerabilities)
+        print('No Bad randomness found')
+    if args.solidity_file:
+        analyze_vulnerabilities(solidity_file_path)
 
 
 if __name__ == '__main__':
